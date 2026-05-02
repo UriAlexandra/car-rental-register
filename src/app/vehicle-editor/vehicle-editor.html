@@ -1,0 +1,108 @@
+<div class="container mt-4 mb-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h4 class="mb-0">Adding New Vehicle</h4>
+        </div>
+        
+        <div class="card-body">
+          @if (errorMessage) {
+            <div class="alert alert-danger">
+              {{ errorMessage }}
+            </div>
+          }
+
+          <form [formGroup]="vehicleForm" (ngSubmit)="onSubmit()">
+            
+            <div class="row mb-3">
+              <!--Jármű típusa -->
+              <div class="col-md-4">
+                <label for="vehicleType" class="form-label">Vehicle Type <span class="text-danger">*</span></label>
+                <select id="vehicleType" class="form-select" formControlName="vehicleType">
+                  <option value="CAR">Car</option>
+                  <option value="WATERCRAFT">Watercraft</option>
+                </select>
+              </div>
+              <!-- Gyártó -->
+              <div class="col-md-4">
+                <label for="manufacturer" class="form-label">Manufacturer <span class="text-danger">*</span></label>
+                <input type="text" id="manufacturer" class="form-control" formControlName="manufacturer" [class.is-invalid]="isInvalid('manufacturer')">
+                <div class="invalid-feedback">The manufacturer is required.</div>
+              </div>
+              <!-- Modell -->
+              <div class="col-md-4">
+                <label for="model" class="form-label">Model <span class="text-danger">*</span></label>
+                <input type="text" id="model" class="form-control" formControlName="model" [class.is-invalid]="isInvalid('model')">
+                <div class="invalid-feedback">The model is required.</div>
+              </div>
+            </div>
+
+            <hr>
+
+            <div class="row mb-3">
+              <!-- Rendszám -->
+              <div class="col-md-4">
+                <label for="licensePlate" class="form-label">License Plate</label>
+                <input type="text" id="licensePlate" class="form-control" formControlName="licensePlate">
+              </div>
+              <!-- Alvázszám -->
+              <div class="col-md-4">
+                <label for="chassisNumber" class="form-label">Chassis Number <span class="text-danger">*</span></label>
+                <input type="text" id="chassisNumber" class="form-control" formControlName="chassisNumber" [class.is-invalid]="isInvalid('chassisNumber')">
+                <div class="invalid-feedback">The chassis number is required.</div>
+              </div>
+              <!-- Gyári sorszám -->
+              <div class="col-md-4">
+                <label for="serialNumber" class="form-label">Serial Number <span class="text-danger">*</span></label>
+                <input type="text" id="serialNumber" class="form-control" formControlName="serialNumber" [class.is-invalid]="isInvalid('serialNumber')">
+                <div class="invalid-feedback">The serial number is required.</div>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <!-- Beszerzés dátuma -->
+              <div class="col-md-4">
+                <label for="purchaseDate" class="form-label">Purchase Date <span class="text-danger">*</span></label>
+                <input type="date" id="purchaseDate" class="form-control" formControlName="purchaseDate" [class.is-invalid]="isInvalid('purchaseDate')">
+                <div class="invalid-feedback">The date is required.</div>
+              </div>
+            </div>
+
+            <hr>
+            <h5 class="mb-3">Tariff</h5>
+
+            <div class="row mb-4">
+              <!-- Napi díj -->
+              <div class="col-md-4">
+                <label for="dailyRate" class="form-label">Daily Rate (Ft) <span class="text-danger">*</span></label>
+                <input type="number" id="dailyRate" class="form-control" formControlName="dailyRate" [class.is-invalid]="isInvalid('dailyRate')">
+                <div class="invalid-feedback">The daily rate is required.</div>
+              </div>
+              <!-- Km díj -->
+              <div class="col-md-4">
+                <label for="kmRate" class="form-label">Kilometer Rate (Ft) <span class="text-danger">*</span></label>
+                <input type="number" id="kmRate" class="form-control" formControlName="kmRate" [class.is-invalid]="isInvalid('kmRate')">
+                <div class="invalid-feedback">The kilometer rate is required.</div>
+              </div>
+              <!-- Kártérítési díj -->
+              <div class="col-md-4">
+                <label for="damageFee" class="form-label">Damage Fee (Ft) <span class="text-danger">*</span></label>
+                <input type="number" id="damageFee" class="form-control" formControlName="damageFee" [class.is-invalid]="isInvalid('damageFee')">
+                <div class="invalid-feedback">The damage fee is required.</div>
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-between">
+              <a routerLink="/vehicles" class="btn btn-secondary">Cancel</a>
+              <button type="submit" class="btn btn-success" [disabled]="vehicleForm.invalid">Save Vehicle</button>
+            </div>
+            
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

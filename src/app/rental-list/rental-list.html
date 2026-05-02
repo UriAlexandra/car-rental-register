@@ -1,0 +1,70 @@
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Overview of rentals</h2>
+    <a class="btn btn-primary" routerLink="/create-rental">
+      <i class="bi bi-plus-circle me-1"></i> New rental
+    </a>
+  </div>
+  
+  <div class="table-responsive shadow-sm">
+    <table class="table table-hover align-middle bg-white">
+      <thead class="table-dark">
+        <tr>
+          <th>Customer Name</th>
+          <th>Rental Date</th>
+          <th>Rented Vehicle</th>
+          <th>Status</th>
+          <th>Return Time</th>
+          <th> Paid Fee</th>
+          <th class="text-center">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Végigmegyünk a kölcsönzéseken -->
+        @for (rental of rentals; track rental.id) {
+          
+          <!-- Végigmegyünk a kölcsönzéshez tartozó járműveken -->
+          @for (item of rental.items; track item.id) {
+            <tr>
+              <td class="fw-bold">{{ rental.customer.name }}</td>
+              <td>{{ rental.rentalDate | date:'yyyy.MM.dd. HH:mm' }}</td>
+              <td>
+                {{ item.vehicle.manufacturer }} {{ item.vehicle.model }} 
+                <small class="text-muted d-block">({{ item.vehicle.licensePlate || item.vehicle.serialNumber }})</small>
+              </td>
+              <td>
+                <!-- Státusz jelölők -->
+                @if (item.status === rentalItemStatusEnum.ACTIVE || item.status === rentalItemStatusEnum.PENDING) {
+                  <span class="badge text-bg-warning">In Progress</span>
+                } @else if (item.status === rentalItemStatusEnum.RETURNED) {
+                  <span class="badge text-bg-success">Returned</span>
+                } @else if (item.status === rentalItemStatusEnum.DAMAGED) {
+                  <span class="badge text-bg-danger">Damaged on Return</span>
+                }
+              </td>
+              <td>{{ item.returnDate ? (item.returnDate | date:'yyyy.MM.dd. HH:mm') : '-' }}</td>
+              <td class="fw-bold">
+                {{ item.totalFee !== null && item.totalFee !== undefined ? (item.totalFee + ' Ft') : '-' }}
+              </td>
+              <td class="text-center">
+                <!-- Csak akkor lehessen "Visszavenni", ha még aktív a kölcsönzés -->
+                @if (item.status === rentalItemStatusEnum.ACTIVE || item.status === rentalItemStatusEnum.PENDING) {
+                  <!-- A gomb átvisz minket a visszavétel/díjszámítás oldalra (később készítjük el) -->
+                  <button class="btn btn-sm btn-outline-success">
+                    Closing the return
+                  </button>
+                }
+              </td>
+            </tr>
+          }
+        } @empty {
+          <tr>
+            <td colspan="7" class="text-center text-muted py-5">
+              There are currently no recorded rentals in the system.
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

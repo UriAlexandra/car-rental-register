@@ -1,0 +1,85 @@
+<div class="container mt-4 mb-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h4 class="mb-0">Start a rental</h4>
+        </div>
+        
+        <div class="card-body">
+          @if (errorMessage) {
+            <div class="alert alert-danger">{{ errorMessage }}</div>
+          }
+
+          <form [formGroup]="rentalForm" (ngSubmit)="onSubmit()">
+            
+            <div class="row mb-3">
+              <!-- Ügyfél kiválasztása -->
+              <div class="col-md-12 mb-3">
+                <label for="customerId" class="form-label">Customer selection <span class="text-danger">*</span></label>
+                <select id="customerId" class="form-select" formControlName="customerId" [class.is-invalid]="isInvalid('customerId')">
+                  <option value="" disabled selected>-- Select a customer --</option>
+                  @for (customer of customers; track customer.id) {
+                    <option [value]="customer.id">
+                      {{ customer.name }} (ID: {{ customer.idCardNumber }})
+                    </option>
+                  }
+                </select>
+                <div class="invalid-feedback">Choose a customer!</div>
+              </div>
+
+              <!-- Jármű kiválasztása -->
+              <div class="col-md-12 mb-3">
+                <label for="vehicleId" class="form-label">Free vehicle selection <span class="text-danger">*</span></label>
+                <select id="vehicleId" class="form-select" formControlName="vehicleId" [class.is-invalid]="isInvalid('vehicleId')">
+                  <option value="" disabled selected>-- Select a free vehicle --</option>
+                  @for (vehicle of freeVehicles; track vehicle.id) {
+                    <option [value]="vehicle.id">
+                      {{ vehicle.manufacturer }} {{ vehicle.model }} - {{ vehicle.licensePlate || vehicle.serialNumber }} ({{ vehicle.dailyRate }} Ft/nap)
+                    </option>
+                  }
+                </select>
+                <div class="invalid-feedback">Please select a free vehicle!</div>
+                @if (freeVehicles.length === 0) {
+                  <small class="text-warning mt-1"><i class="bi bi-exclamation-triangle"></i> There are no free vehicles available in the system.</small>
+                }
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <!-- Kiadás dátuma -->
+              <div class="col-md-6">
+                <label for="rentalDate" class="form-label">Rental date <span class="text-danger">*</span></label>
+                <input type="date" id="rentalDate" class="form-control" formControlName="rentalDate" [class.is-invalid]="isInvalid('rentalDate')">
+                <div class="invalid-feedback">Date is required.</div>
+              </div>
+
+              <!-- Induló kilométeróra állása -->
+              <div class="col-md-6">
+                <label for="startKm" class="form-label">Starting odometer reading <span class="text-danger">*</span></label>
+                <div class="input-group">
+                  <input type="number" id="startKm" class="form-control" formControlName="startKm" [class.is-invalid]="isInvalid('startKm')">
+                  <span class="input-group-text">km</span>
+                </div>
+                <div class="invalid-feedback">Valid odometer reading is required.</div>
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label for="notes" class="form-label">Notes (Optional)</label>
+              <textarea id="notes" class="form-control" rows="3" formControlName="notes" placeholder="For example: minor scratch on the left door at pickup..."></textarea>
+            </div>
+
+            <div class="d-flex justify-content-between">
+              <a routerLink="/rentals" class="btn btn-secondary">Cancel</a>
+              <button type="submit" class="btn btn-success" [disabled]="rentalForm.invalid">Save Rental</button>
+            </div>
+            
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
