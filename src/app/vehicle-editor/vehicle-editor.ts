@@ -1,7 +1,8 @@
 import { Component, inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { VehicleDTO, VehicleService, VehicleType, VehicleStatus } from '../services/vehicle.services';
+import { VehicleService } from '../services/vehicle.services';
+import { VehicleStatus, VehicleType } from '../../../models/enums';
 
 @Component({
   selector: 'app-vehicle-editor',
@@ -44,7 +45,7 @@ export class VehicleEditor {
         },
         error: (err) => {
           // Itt jelenítjük meg a backend által küldött "foglalt rendszám/alvázszám" hibaüzenetet[cite: 1]
-          this.errorMessage = err.error?.error || 'Váratlan hiba történt a jármű mentése során.';
+          this.errorMessage = err.error?.error || 'An unexpected error occurred while saving the vehicle.';
           console.error(err);
         }
       });

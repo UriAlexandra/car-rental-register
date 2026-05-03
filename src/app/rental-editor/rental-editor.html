@@ -12,7 +12,7 @@
             <div class="alert alert-danger">{{ errorMessage }}</div>
           }
 
-          <form [formGroup]="rentalForm" (ngSubmit)="onSubmit()">
+          <form [formGroup]="rentalForm" (ngSubmit)="saveRental()">
             
             <div class="row mb-3">
               <!-- Ügyfél kiválasztása -->
@@ -73,7 +73,7 @@
 
             <div class="d-flex justify-content-between">
               <a routerLink="/rentals" class="btn btn-secondary">Cancel</a>
-              <button type="submit" class="btn btn-success" [disabled]="rentalForm.invalid">Save Rental</button>
+              <button type="submit" class="btn btn-success" (click)="saveRental()">Save Rental</button>
             </div>
             
           </form>

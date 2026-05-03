@@ -14,4 +14,6 @@ export const routes: Routes = [
   { path: 'create-vehicle', component: VehicleEditor },
   { path: 'rentals', component: RentalList },
   { path: 'create-rental', component: RentalEditor },
+  { path: 'create-rental/:id', component: RentalEditor },
+
 ];

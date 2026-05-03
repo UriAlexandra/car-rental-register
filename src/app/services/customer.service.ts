@@ -1,30 +1,19 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-
-export interface CustomerDTO {
-    id?: number;
-    name: string;
-    address: string;
-    idCardNumber: string;
-    phone: string;
-    email?: string;
-    createdAt?: string; 
-}
+import { CustomerDTO } from './../../../models/index';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CustomerService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:3000/api/customer';
 
-  getAll(): Observable<CustomerDTO[]> {
-    return this.http.get<CustomerDTO[]>(this.apiUrl);
+  getAll() {
+    return this.http.get<CustomerDTO[]>('/api/customer');
   }
 
   // A későbbi funkciókhoz előkészítve
-  create(customer: CustomerDTO): Observable<CustomerDTO> {
-    return this.http.post<CustomerDTO>(this.apiUrl, customer);
+  create(customer: CustomerDTO) {
+    return this.http.post<CustomerDTO>('/api/customer', customer);
   }
 }

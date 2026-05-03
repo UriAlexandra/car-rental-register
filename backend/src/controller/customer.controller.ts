@@ -36,15 +36,5 @@ export class CustomerController extends Controller {
         }
     };
 
-    handleError(res: Response, err: any = null, status = 500, message = 'Unknown server error') {
-        if (err) console.error(err);
 
-        if (err?.code === 'ER_DUP_ENTRY' || err?.errno === 1062) {
-            return res.status(400).json({
-                error: 'A megadott igazolványszám (vagy email) már létezik a rendszerben.'
-            });
-        }
-
-        return super.handleError(res, err, status, message);
-    };
 }

@@ -11,9 +11,9 @@ import { CustomerService } from '../services/customer.service';
   styleUrl: './customer-editor.css'
 })
 export class CustomerEditor {
-  private fb = inject(FormBuilder);
-  private customerService = inject(CustomerService);
-  private router = inject(Router);
+  fb = inject(FormBuilder);
+  customerService = inject(CustomerService);
+  router = inject(Router);
 
   customerForm: FormGroup = this.fb.group({
     name: ['', Validators.required],

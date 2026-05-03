@@ -1,6 +1,8 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { VehicleDTO, VehicleService, VehicleType, VehicleStatus } from '../services/vehicle.services';
+import { VehicleService } from '../services/vehicle.services';
+import { VehicleDTO } from '../../../models';
+import { VehicleStatus, VehicleType } from '../../../models/enums';
 
 @Component({
   selector: 'app-vehicle-list',
@@ -11,7 +13,7 @@ import { VehicleDTO, VehicleService, VehicleType, VehicleStatus } from '../servi
 })
 export class VehicleList implements OnInit {
   vehicles: VehicleDTO[] = [];
-  private vehicleService = inject(VehicleService);
+  vehicleService = inject(VehicleService);
 
   vehicleTypeEnum = VehicleType;
   vehicleStatusEnum = VehicleStatus;
