@@ -1,17 +1,10 @@
-export enum VehicleType {
-    CAR = 'CAR',
-    WATERCRAFT = 'WATERCRAFT'
-}
-
 export enum VehicleStatus {
-    FREE = 'FREE',
-    RENTED = 'RENTED',
-    SCRAPPED = 'SCRAPPED'
+    Free = 'Szabad',
+    Rented = 'Kikölcsönzött',
+    Scrapped = 'Selejtezett'
 }
 
-export enum RentalItemStatus {
-    PENDING = 'PENDING',
-    RETURNED = 'RETURNED',
-    DAMAGED = 'DAMAGED',
-    ACTIVE = 'ACTIVE'
+export enum VehicleType {
+    Car = 'Személyautó',
+    Boat = 'Hajó',
 }

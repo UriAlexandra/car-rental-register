@@ -1,10 +1,9 @@
 import { Repository } from "typeorm";
-import { Request, Response } from "express";
 
 export abstract class Controller {
     repository: Repository<any>;
 
-    getAll = async (req: Request, res: Response) => {
+    getAll = async (req, res) => {
         try {
             const entities = await this.repository.find();
             res.json(entities);
@@ -13,7 +12,7 @@ export abstract class Controller {
         }
     };
 
-    getOne = async (req: Request, res: Response) => {
+    getOne = async (req, res) => {
         try {
             const id = req.params['id'];
 
@@ -28,7 +27,7 @@ export abstract class Controller {
         }
     };
 
-    create = async (req: Request, res: Response) => {
+    create = async (req, res) => {
         try {
             const entityToCreate = this.repository.create(req.body);
             delete entityToCreate['id'];
@@ -39,7 +38,7 @@ export abstract class Controller {
         }
     };
 
-    update = async (req: Request, res: Response) => {
+    update = async (req, res) => {
         try {
             const entityToSave = this.repository.create(req.body);
             if (!entityToSave.id) {
@@ -58,7 +57,7 @@ export abstract class Controller {
         }
     };
 
-    delete = async (req: Request, res: Response) => {
+    delete = async (req, res) => {
         try {
             const id = req.params['id'];
             const entity = await this.repository.findOneBy({ id: id });
@@ -73,7 +72,7 @@ export abstract class Controller {
         }
     };
 
-    handleError = (res: Response, err: any, status = 500, message = 'Unknown server error') => {
+    handleError = (res, err, status = 500, message = 'Unknown server error') => {
         if (err) {
             console.error(err);
         }

@@ -1,46 +1,34 @@
-import { VehicleType, VehicleStatus, RentalItemStatus } from './enums';
+import { VehicleStatus, VehicleType } from "./enums";
 
 export interface CustomerDTO {
     id: number;
     name: string;
     address: string;
     idCardNumber: string;
-    phone: string;
-    email?: string;
-    createdAt?: string; 
+    phoneNumber: string;
+    rentals: RentalDTO[];
 }
 
 export interface VehicleDTO {
     id: number;
-    vehicleType: VehicleType;
+    type: VehicleType;
     manufacturer: string;
-    model: string;
-    licensePlate?: string | null;
+    licensePlate: string;
     chassisNumber: string;
-    purchaseDate: string;
+    purchaseDate: Date;
     serialNumber: string;
-    dailyRate: number;
-    kmRate: number;
-    damageFee: number;
+    dailyFee: number;
+    kmFee: number;
     status: VehicleStatus;
-}
-
-export interface RentalItemDTO {
-    id: number;
-    rentalId?: number; 
-    vehicle: VehicleDTO;
-    startKm: number;
-    endKm?: number | null;
-    isDamaged: boolean;
-    returnDate?: string | null;
-    totalFee?: number | null;
-    status: RentalItemStatus;
 }
 
 export interface RentalDTO {
     id: number;
     customer: CustomerDTO;
-    rentalDate: string;
-    notes?: string | null;
-    items: RentalItemDTO[]; 
+    vehicle: VehicleDTO;
+    startDate: Date;
+    endDate: Date | null;
+    drivenKm: number | null;
+    damageFee: number | null;
+    totalFee: number | null;
 }

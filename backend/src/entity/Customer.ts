@@ -1,29 +1,24 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, CreateDateColumn } from 'typeorm';
-import { Rental } from './Rental';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { CustomerDTO } from "../../../models";
+import { Rental } from "./Rental";
 
 @Entity()
-export class Customer {
+export class Customer implements CustomerDTO {
     @PrimaryGeneratedColumn()
-    id!: number;
+    id: number;
 
     @Column()
-    name!: string;
+    name: string;
 
     @Column()
-    address!: string;
+    address: string;
+
+    @Column({ unique: true })
+    idCardNumber: string;
 
     @Column()
-    idCardNumber!: string;
+    phoneNumber: string;
 
-    @Column()
-    phone!: string;
-
-    @Column()
-    email: string;
-
-    @OneToMany(() => Rental, (rental) => rental.customer)
-    rentals!: Rental[];
-
-    @CreateDateColumn({ name: 'createdAt', type: 'datetime' })
-    createdAt: Date;
+    @OneToMany(() => Rental, rental => rental.customer)
+    rentals: Rental[];
 }

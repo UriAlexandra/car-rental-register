@@ -16,7 +16,7 @@ async function main() {
             return;
         }
 
-        console.log('Server: OK');
+        console.log('Server is listening on port 3000.');
     });
 }
 

@@ -1,39 +1,49 @@
 <div class="container mt-4">
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h2>Customer registration</h2>
-    <a class="btn btn-primary" (click)="create()">New customer</a>
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Ügyfelek nyilvántartása</h2>
+    <button class="btn btn-success" routerLink="/customer-editor">Új ügyfél rögzítése</button>
   </div>
-  
-  <div class="table-responsive">
-    <table class="table table-striped table-hover align-middle">
-      <thead class="table-dark">
+
+  <table class="table table-striped table-hover align-middle border">
+    <thead class="table-dark">
+      <tr>
+        <th>Név</th>
+        <th>Cím</th>
+        <th>Igazolványszám</th>
+        <th>Telefon</th>
+        <th>Jelenleg kikölcsönzött járművek</th>
+        <th>Műveletek</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (c of customers(); track c.id) {
         <tr>
-          <th>#ID</th>
-          <th>Name</th>
-          <th>Address</th>
-          <th>Id Card Number</th>
-          <th>Phone</th>
-          <th>E-mail</th>
+          <td><strong>{{ c.name }}</strong></td>
+          <td>{{ c.address }}</td>
+          <td>{{ c.idCardNumber }}</td>
+          <td>{{ c.phoneNumber }}</td>
+          <td>
+            @if (getActiveRentals(c).length > 0) {
+              <ul class="mb-0 ps-3">
+                @for (rental of getActiveRentals(c); track rental.id) {
+                  <li>
+                    {{ rental.vehicle?.manufacturer }}
+                    <span class="badge bg-warning text-dark">{{ rental.vehicle?.licensePlate }}</span>
+                  </li>
+                }
+              </ul>
+            } @else {
+              <span class="text-muted">Nincs aktív kölcsönzése</span>
+            }
+          </td>
+          <td>
+            <button class="btn btn-primary btn-sm me-2" (click)="editCustomer(c)">Adatlap / Kölcsönzés</button>
+            <button class="btn btn-danger btn-sm" (click)="deleteCustomer(c)">Törlés</button>
+          </td>
         </tr>
-      </thead>
-      <tbody>
-        @for (customer of customers(); track customer.id) {
-          <tr>
-            <td>{{ customer.id }}</td>
-            <td class="fw-bold">{{ customer.name }}</td>
-            <td>{{ customer.address }}</td>
-            <td>{{ customer.idCardNumber }}</td>
-            <td>{{ customer.phone }}</td>
-            <td>{{ customer.email || '-' }}</td>
-          </tr>
-        } @empty {
-          <tr>
-            <td colspan="6" class="text-center text-muted py-4">
-              There are no customers to display in the system.
-            </td>
-          </tr>
-        }
-      </tbody>
-    </table>
-  </div>
+      } @empty {
+        <tr><td colspan="5" class="text-center text-muted">Nincs még regisztrált ügyfél a rendszerben.</td></tr>
+      }
+    </tbody>
+  </table>
 </div>

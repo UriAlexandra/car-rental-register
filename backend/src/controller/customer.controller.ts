@@ -1,40 +1,32 @@
-import { Controller } from "./base.controller";
 import { AppDataSource } from "../data-source";
 import { Customer } from "../entity/Customer";
-import { Request, Response } from 'express';
+import { Controller } from "./base.controller";
 
 export class CustomerController extends Controller {
     repository = AppDataSource.getRepository(Customer);
 
-    getAll = async (req: Request, res: Response): Promise<any> => {
+    getAll = async (req, res) => {
         try {
-            const customers = await this.repository.find({
-                relations: ['rentals', 'rentals.items', 'rentals.items.vehicle']
+            const entities = await this.repository.find({
+                relations: ['rentals', 'rentals.vehicle']
             });
-            res.json(customers);
+            res.json(entities);
         } catch (err) {
             this.handleError(res, err);
         }
     };
 
-    getOne = async (req: Request, res: Response): Promise<any> => {
+    getOne = async (req, res) => {
         try {
-            const id = parseInt(req.params.id as string);
-
-            const customer = await this.repository.findOne({
-                where: { id },
-                relations: ['rentals', 'rentals.items', 'rentals.items.vehicle']
+            const id = req.params['id'];
+            const entity = await this.repository.findOne({
+                where: { id: id },
+                relations: ['rentals', 'rentals.vehicle']
             });
-
-            if (!customer) {
-                return this.handleError(res, null, 404, 'No entity exists with the given id');
-            }
-
-            res.json(customer);
+            if (!entity) return this.handleError(res, null, 404, 'Ügyfél nem található.');
+            res.json(entity);
         } catch (err) {
             this.handleError(res, err);
         }
     };
-
-
 }

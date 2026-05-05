@@ -1,31 +1,30 @@
-import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { inject, Injectable } from '@angular/core';
 import { RentalDTO } from './../../../models/index';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class RentalService {
-  private http = inject(HttpClient);
+  http = inject(HttpClient);
 
-  getAll(){
+  getAll() {
     return this.http.get<RentalDTO[]>('/api/rental');
   }
 
-  getOne(id: number): Observable<RentalDTO> {
-    return this.http.get<RentalDTO>(`/api/rental/${id}`);
+  getOne(id: number) {
+    return this.http.get<RentalDTO>('/api/rental/' + id);
   }
 
-  create(rental: RentalDTO): Observable<RentalDTO> {
+  create(rental: RentalDTO) {
     return this.http.post<RentalDTO>('/api/rental', rental);
   }
 
-  update(rental: RentalDTO): Observable<RentalDTO> {
-    return this.http.put<RentalDTO>(`/api/rental/${rental.id}`, rental);
+  closeRental(id: number, data: { endDate: string | Date, drivenKm: number, isDamaged: boolean }) {
+    return this.http.put<RentalDTO>(`/api/rental/${id}/close`, data);
   }
 
-  delete(id: number): Observable<void> {
-    return this.http.delete<void>(`/api/rental/${id}`);
+  delete(id: number) {
+    return this.http.delete('/api/rental/' + id);
   }
 }

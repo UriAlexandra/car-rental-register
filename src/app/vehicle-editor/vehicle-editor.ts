@@ -1,61 +1,77 @@
-import { Component, inject } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
-import { VehicleService } from '../services/vehicle.services';
+import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
+import { VehicleDTO } from '../../../models';
 import { VehicleStatus, VehicleType } from '../../../models/enums';
+import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { VehicleService } from '../services/vehicle.services';
 
 @Component({
   selector: 'app-vehicle-editor',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink],
-  templateUrl: './vehicle-editor.html',
-  styleUrl: './vehicle-editor.css'
+  imports: [FormsModule],
+  templateUrl: './vehicle-editor.html'
 })
-export class VehicleEditor {
-  private fb = inject(FormBuilder);
-  private vehicleService = inject(VehicleService);
-  private router = inject(Router);
+export class VehicleEditor implements OnInit {
+  vehicle: VehicleDTO = {
+    id: 0,
+    type: VehicleType.Car, // Alapértelmezett típus
+    manufacturer: '',
+    licensePlate: '',
+    chassisNumber: '',
+    purchaseDate: new Date().toISOString().split('T')[0] as any, // Mai nap alapértelmezetten
+    serialNumber: '',
+    dailyFee: 0,
+    kmFee: 0,
+    status: VehicleStatus.Free
+  };
 
-  // Elérhetővé tesszük a HTML számára az enum típusokat
-  vehicleTypes = Object.values(VehicleType);
-  
-  // Űrlap definíciója
-  vehicleForm: FormGroup = this.fb.group({
-    vehicleType: [VehicleType.CAR, Validators.required],
-    manufacturer: ['', Validators.required],
-    model: ['', Validators.required],
-    licensePlate: [''], // Opcionális, vízijárműveknél gyakran nincs
-    chassisNumber: ['', Validators.required],
-    purchaseDate: ['', Validators.required],
-    serialNumber: ['', Validators.required],
-    // A díjakhoz hozzáadunk egy minimum validációt is
-    dailyRate: [null, [Validators.required, Validators.min(0)]],
-    kmRate: [null, [Validators.required, Validators.min(0)]],
-    damageFee: [null, [Validators.required, Validators.min(0)]],
-    status: [VehicleStatus.FREE, Validators.required] // Alapértelmezésben szabad a jármű[cite: 1]
-  });
+  types = Object.values(VehicleType);
+  statuses = Object.values(VehicleStatus);
 
-  errorMessage: string = '';
+  vehicleService = inject(VehicleService);
+  router = inject(Router);
+  activatedRoute = inject(ActivatedRoute);
+  cdRef = inject(ChangeDetectorRef);
 
-  onSubmit(): void {
-    if (this.vehicleForm.valid) {
-      this.vehicleService.create(this.vehicleForm.value).subscribe({
-        next: () => {
-          this.router.navigate(['/vehicles']);
+
+  isNew = true;
+
+  ngOnInit(): void {
+    const id = this.activatedRoute.snapshot.params['id'];
+    if (id) {
+      this.isNew = false;
+      this.vehicleService.getOne(id).subscribe({
+        next: (data) => {
+          this.vehicle = data;
+          // Dátum formázása a HTML <input type="date"> számára (levágjuk az időzónát)
+          if (this.vehicle.purchaseDate) {
+            this.vehicle.purchaseDate = new Date(this.vehicle.purchaseDate).toISOString().split('T')[0] as any;
+          }
+          this.cdRef.markForCheck();
         },
-        error: (err) => {
-          // Itt jelenítjük meg a backend által küldött "foglalt rendszám/alvázszám" hibaüzenetet[cite: 1]
-          this.errorMessage = err.error?.error || 'An unexpected error occurred while saving the vehicle.';
-          console.error(err);
-        }
+        error: (err) => alert('Hiba az adatok betöltésekor!')
       });
-    } else {
-      this.vehicleForm.markAllAsTouched();
     }
   }
 
-  isInvalid(controlName: string): boolean {
-    const control = this.vehicleForm.get(controlName);
-    return !!(control && control.invalid && (control.dirty || control.touched));
+  save() {
+    // Biztonsági ellenőrzés
+    if (!this.vehicle.licensePlate || !this.vehicle.manufacturer) {
+      alert('A gyártó és a rendszám megadása kötelező!');
+      return;
+    }
+
+    const request = this.isNew
+      ? this.vehicleService.create(this.vehicle)
+      : this.vehicleService.update(this.vehicle);
+
+    request.subscribe({
+      next: () => this.router.navigateByUrl('/vehicles'),
+      error: (err) => console.error('Hiba mentéskor', err)
+    });
+  }
+
+    cancel() {
+    this.router.navigateByUrl('/vehicles');
   }
 }

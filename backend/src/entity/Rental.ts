@@ -1,24 +1,31 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
-import { Customer } from './Customer';
-import { RentalItem } from './RentalItem';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { RentalDTO } from "../../../models";
+import { Vehicle } from "./Vehicle";
+import { Customer } from "./Customer";
 
-@Entity('rental')
-export class Rental {
+@Entity()
+export class Rental implements RentalDTO {
     @PrimaryGeneratedColumn()
-    id!: number;
+    id: number;
 
-    @ManyToOne(() => Customer, (customer) => customer.rentals, { nullable: false })
-    @JoinColumn({ name: 'customer_id' })
-    customer!: Customer;
+    @Column({ type: 'date' })
+    startDate: Date;
 
-    @Column({ name: 'rentalDate', type: 'datetime' })
-    rentalDate!: Date;
+    @Column({ type: 'date', nullable: true })
+    endDate: Date;
 
-    @Column({ type: 'text', nullable: true })
-    notes!: string;
+    @Column({ type: 'int', nullable: true })
+    drivenKm: number;
 
-    // A cascade: true miatt, ha mentesz egy új Rental-t a hozzá tartozó itemekkel, 
-    // a TypeORM automatikusan elmenti az itemeket is.
-    @OneToMany(() => RentalItem, (rentalItem) => rentalItem.rental, { cascade: true })
-    items!: RentalItem[];
+    @Column({ type: 'int', nullable: true, default: 0 })
+    damageFee: number;
+
+    @Column({ type: 'int', nullable: true })
+    totalFee: number;
+
+    @ManyToOne(() => Customer, customer => customer.rentals, { onDelete: 'CASCADE' })
+    customer: Customer;
+
+    @ManyToOne(() => Vehicle, vehicle => vehicle.rentals, { onDelete: 'CASCADE' })
+    vehicle: Vehicle;
 }

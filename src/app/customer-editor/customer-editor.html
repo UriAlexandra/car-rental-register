@@ -1,55 +1,107 @@
-<div class="container mt-4">
-  <div class="row justify-content-center">
-    <div class="col-md-8 col-lg-6">
-      <div class="card shadow-sm">
-        <div class="card-header bg-primary text-white">
-          <h4 class="mb-0">Add New Customer</h4>
+<div class="container mt-4 pb-5">
+  <h2>{{ isNew ? 'Új ügyfél rögzítése' : 'Ügyfél adatlap és bérlések' }}</h2>
+
+  <div class="card shadow-sm mb-4">
+    <div class="card-body">
+      <h5 class="card-title text-primary">Személyes adatok</h5>
+      <form #cForm="ngForm" (ngSubmit)="saveCustomer()">
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Név</label>
+            <input type="text" class="form-control" [(ngModel)]="customer.name" name="name" required>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Igazolványszám</label>
+            <input type="text" class="form-control" [(ngModel)]="customer.idCardNumber" name="idCard" required>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Telefon</label>
+            <input type="text" class="form-control" [(ngModel)]="customer.phoneNumber" name="phone" required>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Cím</label>
+            <input type="text" class="form-control" [(ngModel)]="customer.address" name="address" required>
+          </div>
         </div>
-        <div class="card-body">
-          @if (errorMessage) {
-            <div class="alert alert-danger">{{ errorMessage }}</div>
-          }
+        <button type="submit" class="btn btn-primary" [disabled]="cForm.invalid">Alapadatok mentése</button>
+        <button type="button" class="btn btn-secondary ms-2" (click)="back()">Vissza a listához</button>
+      </form>
+    </div>
+  </div>
 
-          <form [formGroup]="customerForm" (ngSubmit)="onSubmit()">
-            <div class="mb-3">
-              <label for="name" class="form-label">Name <span class="text-danger">*</span></label>
-              <input type="text" id="name" class="form-control" formControlName="name" [class.is-invalid]="isInvalid('name')">
-              <div class="invalid-feedback">Name is required.</div>
-            </div>
-
-            <div class="mb-3">
-              <label for="address" class="form-label">Address <span class="text-danger">*</span></label>
-              <input type="text" id="address" class="form-control" formControlName="address" [class.is-invalid]="isInvalid('address')">
-              <div class="invalid-feedback">Address is required.</div>
-            </div>
-
-            <div class="row mb-3">
-              <div class="col-md-6">
-                <label for="idCardNumber" class="form-label">ID Card Number <span class="text-danger">*</span></label>
-                <input type="text" id="idCardNumber" class="form-control" formControlName="idCardNumber" [class.is-invalid]="isInvalid('idCardNumber')">
-                <div class="invalid-feedback">ID card number is required.</div>
-              </div>
-              
-              <div class="col-md-6">
-                <label for="phone" class="form-label">Phone Number <span class="text-danger">*</span></label>
-                <input type="tel" id="phone" class="form-control" formControlName="phone" [class.is-invalid]="isInvalid('phone')">
-                <div class="invalid-feedback">Phone number is required.</div>
-              </div>
-            </div>
-
-            <div class="mb-4">
-              <label for="email" class="form-label">E-mail Address</label>
-              <input type="email" id="email" class="form-control" formControlName="email" [class.is-invalid]="isInvalid('email')">
-              <div class="invalid-feedback">Please enter a valid email address.</div>
-            </div>
-
-            <div class="d-flex justify-content-between">
-              <a routerLink="/customers" class="btn btn-secondary">Cancel</a>
-              <button type="submit" class="btn btn-success" [disabled]="customerForm.invalid">Save</button>
-            </div>
-          </form>
+  @if (!isNew) {
+    <div class="card shadow-sm mb-4 border-success">
+      <div class="card-body">
+        <h5 class="card-title text-success">Új jármű kiadása</h5>
+        <div class="input-group">
+          <select class="form-select" [(ngModel)]="selectedVehicleId">
+            <option [ngValue]="null">Válassz egy szabad járművet...</option>
+            @for (v of freeVehicles; track v.id) {
+              <option [ngValue]="v.id">{{ v.type }} - {{ v.manufacturer }} ({{ v.licensePlate }}) - {{ v.dailyFee }} Ft/nap</option>
+            }
+          </select>
+          <button class="btn btn-success" [disabled]="!selectedVehicleId" (click)="startRental()">Kölcsönzés indítása</button>
         </div>
       </div>
     </div>
-  </div>
+
+    <div class="card shadow-sm">
+      <div class="card-header bg-dark text-white">
+        <h5 class="mb-0">Kölcsönzések naplója</h5>
+      </div>
+      <div class="card-body">
+        <table class="table table-hover align-middle">
+          <thead>
+            <tr>
+              <th>Jármű</th>
+              <th>Kezdés</th>
+              <th>Befejezés / Díjszámítás</th>
+              <th>Végösszeg</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (r of customer.rentals; track r.id) {
+              <tr>
+                <td>
+                  <strong>{{ r.vehicle?.manufacturer }}</strong><br>
+                  <small class="text-muted">{{ r.vehicle?.licensePlate }}</small>
+                </td>
+                <td>{{ r.startDate }}</td>
+                <td>
+                  @if (!r.endDate) {
+                    <div class="row g-2 align-items-center">
+                      <div class="col-auto">
+                        <input type="number" class="form-control form-control-sm" placeholder="KM" [(ngModel)]="drivenKmMap[r.id]">
+                      </div>
+                      <div class="col-auto">
+                        <div class="form-check">
+                          <input class="form-check-config" type="checkbox" [(ngModel)]="isDamagedMap[r.id]" [id]="'dmg'+r.id">
+                          <label class="form-check-label ms-1" [for]="'dmg'+r.id">Sérült?</label>
+                        </div>
+                      </div>
+                      <div class="col-auto">
+                        <button class="btn btn-sm btn-outline-danger" (click)="finishRental(r.id)">Visszavétel</button>
+                      </div>
+                    </div>
+                  } @else {
+                    <span class="text-success">{{ r.endDate }}</span><br>
+                    <small>{{ r.drivenKm }} km, {{ r.damageFee ? 'Sérült (+50k)' : 'Sértetlen' }}</small>
+                  }
+                </td>
+                <td>
+                  @if (r.totalFee) {
+                    <span class="fw-bold">{{ r.totalFee }} Ft</span>
+                  } @else {
+                    <span class="badge bg-warning text-dark">Folyamatban</span>
+                  }
+                </td>
+              </tr>
+            } @empty {
+              <tr><td colspan="4" class="text-center text-muted">Még nem volt kölcsönzése.</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
 </div>
