@@ -3,6 +3,7 @@
 
   <div class="card shadow-sm mt-3">
     <div class="card-body">
+      //Létrehozunk egy referenciát az űrlaphoz, amivel később ellenőrizhetjük, hogy minden adatot jól adtak-e meg.
       <form #vehicleForm="ngForm" (ngSubmit)="save()">
 
         <div class="row">
@@ -10,6 +11,7 @@
             <div class="mb-3">
               <label class="form-label">Típus</label>
               <select class="form-select" [(ngModel)]="vehicle.type" name="type">
+               <!-- Végigiterálunk a TS fájlban létrehozott 'types' tömbön-->
                 @for (t of types; track t) {
                   <option [value]="t">{{ t }}</option>
                 }
@@ -28,6 +30,7 @@
 
             <div class="mb-3">
               <label class="form-label">Beszerzés dátuma</label>
+              <!-- Egy beépített HTML naptár (type="date"). Ehhez szigorú "ÉÉÉÉ-HH-NN" formátumra van szükség a TS oldalon. -->
               <input type="date" class="form-control" [(ngModel)]="vehicle.purchaseDate" name="purchaseDate">
             </div>
           </div>
@@ -57,6 +60,7 @@
             <div class="mb-3">
               <label class="form-label">Státusz</label>
               <select class="form-select" [(ngModel)]="vehicle.status" name="status">
+                <!-- Végigiterálunk a TS fájlban létrehozott 'statuses' tömbön -->
                 @for (s of statuses; track s) {
                   <option [value]="s">{{ s }}</option>
                 }

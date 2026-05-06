@@ -16,6 +16,9 @@
       </tr>
     </thead>
     <tbody>
+      <!-- Itt az @for iterál végig a vásárlókon. 
+           Figyeld meg a customers() hívást a zárójelekkel: mivel ez egy Angular Signal (reaktív változó), 
+           a zárójelekkel "olvassuk ki" az aktuális értékét. -->
       @for (c of customers(); track c.id) {
         <tr>
           <td><strong>{{ c.name }}</strong></td>
@@ -23,8 +26,11 @@
           <td>{{ c.idCardNumber }}</td>
           <td>{{ c.phoneNumber }}</td>
           <td>
+            <!-- Meghívjuk a TS fájl getActiveRentals függvényét, és átadjuk neki az aktuális ügyfelet (c). 
+                 Ha a visszaadott tömb hossza nagyobb, mint 0, megjelenítjük a listát. -->
             @if (getActiveRentals(c).length > 0) {
               <ul class="mb-0 ps-3">
+                <!-- Végigiterálunk az aktív bérléseken. -->
                 @for (rental of getActiveRentals(c); track rental.id) {
                   <li>
                     {{ rental.vehicle?.manufacturer }}
@@ -37,6 +43,8 @@
             }
           </td>
           <td>
+            <!-- A (click) esemény összeköti a gombokat a TS megfelelő metódusaival, 
+                 és paraméterként átadja nekik az adott sor ügyfelét (c). -->
             <button class="btn btn-primary btn-sm me-2" (click)="editCustomer(c)">Adatlap / Kölcsönzés</button>
             <button class="btn btn-danger btn-sm" (click)="deleteCustomer(c)">Törlés</button>
           </td>

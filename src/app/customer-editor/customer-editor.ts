@@ -14,7 +14,9 @@ import { RentalService } from '../services/rental.services';
   imports: [FormsModule],
   templateUrl: './customer-editor.html'
 })
+// Az OnInit interfész implementálása kötelez minket az ngOnInit() metódus megírására.
 export class CustomerEditor implements OnInit {
+  // Kezdeti állapot egy üres ügyféllel
   customer: CustomerDTO = {
     id: 0,
     name: '',
@@ -27,11 +29,12 @@ export class CustomerEditor implements OnInit {
   freeVehicles: VehicleDTO[] = []; // Csak a szabad járművek az új kölcsönzéshez
   selectedVehicleId: number | null = null;
 
-  // Segédváltozók a visszahozatalhoz (lezáráshoz)
+  // Segédváltozók a visszahozatalhoz (lezáráshoz),bérlés ID-jához (kulcs) kötjük az értéket
   returnDate: string = new Date().toISOString().split('T')[0];
   drivenKmMap: { [rentalId: number]: number } = {};
   isDamagedMap: { [rentalId: number]: boolean } = {};
 
+  // Az inject() funkcióval hozzuk be a szükséges szolgáltatásokat és routing modulokat (Dependency Injection).
   customerService = inject(CustomerService);
   vehicleService = inject(VehicleService);
   rentalService = inject(RentalService);
@@ -39,30 +42,34 @@ export class CustomerEditor implements OnInit {
   activatedRoute = inject(ActivatedRoute);
   cdRef = inject(ChangeDetectorRef);
 
+  // Az inject() funkcióval hozzuk be a szükséges szolgáltatásokat és routing modulokat (Dependency Injection).
   isNew = true;
 
   ngOnInit(): void {
+    // Kinyerjük az URL-ből az ID-t
     const id = this.activatedRoute.snapshot.params['id'];
 
     // 1. Szabad járművek betöltése a választóhoz
     this.loadFreeVehicles();
 
+    // Ha van ID, akkor egy már létező ügyfelet szerkesztünk.
     if (id) {
       this.isNew = false;
       this.loadCustomer(id);
     }
   }
 
+  // Lekéri a backendről az ügyfél adatait a CustomerService segítségével.
   loadCustomer(id: number) {
     this.customerService.getOne(id).subscribe(res => {
-      this.customer = res;
-      this.cdRef.markForCheck();
+      this.customer = res; //felülírja a 'customer' változót, ami frissíti a HTML űrlapot.
+      this.cdRef.markForCheck(); //Angular frissítse a felületet
     });
   }
 
   loadFreeVehicles() {
     this.vehicleService.getAll().subscribe(res => {
-      // Csak azokat mutatjuk, amik állapota 'Szabad'
+// Kiszűrjük azokat az autókat, amik épp elérhetőek.
       this.freeVehicles = res.filter(v => v.status === VehicleStatus.Free);
       this.cdRef.markForCheck();
     });
@@ -84,15 +91,17 @@ export class CustomerEditor implements OnInit {
   startRental() {
     if (!this.selectedVehicleId) return;
 
+    // Létrehozzuk az új bérlés objektumot az ügyfél és a kiválasztott autó ID-jával.
     const newRental = {
       customer: this.customer.id,
       vehicle: this.selectedVehicleId,
       startDate: new Date()
     };
 
+    // Elküldjük a backendnek.
     this.rentalService.create(newRental as any).subscribe({
       next: () => {
-        this.selectedVehicleId = null;
+        this.selectedVehicleId = null; // Kinullázzuk a kiválasztót
         this.loadCustomer(this.customer.id); // Frissítjük a listát
         this.loadFreeVehicles(); // Frissítjük a szabad autókat
       },
@@ -102,6 +111,7 @@ export class CustomerEditor implements OnInit {
 
   // --- KÖLCSÖNZÉS LEZÁRÁSA (VISSZAHOZATAL) ---
   finishRental(rentalId: number) {
+    // Kinyerjük a specifikus bérléshez a HTML-ben beírt adatokat a 'Map'-ből.
     const km = this.drivenKmMap[rentalId];
     const damaged = !!this.isDamagedMap[rentalId];
 
@@ -110,6 +120,7 @@ export class CustomerEditor implements OnInit {
       return;
     }
 
+    // API hívás a lezáráshoz.
     this.rentalService.closeRental(rentalId, {
       endDate: this.returnDate,
       drivenKm: km,
@@ -117,6 +128,7 @@ export class CustomerEditor implements OnInit {
     }).subscribe({
       next: (res) => {
         alert(`Kölcsönzés lezárva. Fizetendő: ${res.totalFee} Ft`);
+        // Adatok frissítése a felületen.
         this.loadCustomer(this.customer.id);
         this.loadFreeVehicles();
       },
@@ -124,6 +136,7 @@ export class CustomerEditor implements OnInit {
     });
   }
 
+  // Visszairányít a gyökérkönyvtár
   back() {
     this.router.navigateByUrl('/customers');
   }

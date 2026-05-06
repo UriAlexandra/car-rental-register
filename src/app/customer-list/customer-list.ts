@@ -14,8 +14,11 @@ export class CustomerList implements OnInit {
   router = inject(Router);
   cdRef = inject(ChangeDetectorRef);
 
+  // A 'customers' egy Signal, ami egy CustomerDTO tömböt tárol. 
+  // Kezdeti értéke egy üres tömb: ([]).
   customers = signal<CustomerDTO[]>([]);
 
+  // Ez a metódus az oldal betöltésekor automatikusan lefut.
   ngOnInit(): void {
     this.loadCustomers();
   }
@@ -23,6 +26,7 @@ export class CustomerList implements OnInit {
   loadCustomers() {
     this.customerService.getAll().subscribe({
       next: (data) => {
+        // A Signal értékét a .set() metódussal frissítjük a szervertől kapott adatokra (data).
         this.customers.set(data);
         this.cdRef.markForCheck();
       },
@@ -44,10 +48,13 @@ export class CustomerList implements OnInit {
       return;
     }
 
+    // Megerősítést kérünk a böngésző beépített popupjával.
     if (!confirm(`Biztosan törlöd ${customer.name} ügyfelet a rendszerből?`)) return;
 
     this.customerService.delete(customer.id).subscribe({
       next: () => {
+        // A .filter() segítségével kivesszük a törölt ügyfelet a helyi listából.
+        // A this.customers() hívás lekéri az aktuális tömböt, a .set() pedig beállítja az új, szűrt tömböt.
         this.customers.set(this.customers().filter(c => c.id !== customer.id));
         this.cdRef.markForCheck();
       },
@@ -56,6 +63,7 @@ export class CustomerList implements OnInit {
   }
 
   editCustomer(customer: CustomerDTO) {
+    // Navigáció a szerkesztő oldalra, hozzáfűzve az URL-hez az ügyfél ID-ját (pl. /customer-editor/5)
     this.router.navigate(['/customer-editor', customer.id]);
   }
 }

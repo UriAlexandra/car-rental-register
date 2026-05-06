@@ -8,6 +8,7 @@
         <div class="row">
           <div class="col-md-6 mb-3">
             <label class="form-label">Név</label>
+            <!-- A [(ngModel)] a kétirányú adatkötés (two-way binding).mező értéke közvetlenül szinkronban van a TS fájlban lévő customer.name tulajdonságaival -->
             <input type="text" class="form-control" [(ngModel)]="customer.name" name="name" required>
           </div>
           <div class="col-md-6 mb-3">
@@ -23,28 +24,34 @@
             <input type="text" class="form-control" [(ngModel)]="customer.address" name="address" required>
           </div>
         </div>
+        <!-- A mentés gomb letiltásra kerül ([disabled]), ha a form érvénytelen-->
         <button type="submit" class="btn btn-primary" [disabled]="cForm.invalid">Alapadatok mentése</button>
         <button type="button" class="btn btn-secondary ms-2" (click)="back()">Vissza a listához</button>
       </form>
     </div>
   </div>
 
+  <!-- Az @if az Angular új vezérlési szerkezete. Csak akkor jeleníti meg ezt a blokkot, ha már létező ügyfelet szerkesztünk. -->
   @if (!isNew) {
     <div class="card shadow-sm mb-4 border-success">
       <div class="card-body">
         <h5 class="card-title text-success">Új jármű kiadása</h5>
         <div class="input-group">
+          <!-- A kiválasztott jármű ID-ja -->
           <select class="form-select" [(ngModel)]="selectedVehicleId">
             <option [ngValue]="null">Válassz egy szabad járművet...</option>
+            <!-- Az @for végigiterál a 'freeVehicles' tömbön. A 'track v.id' segít az Angularnak hatékonyan frissíteni a listát. -->
             @for (v of freeVehicles; track v.id) {
               <option [ngValue]="v.id">{{ v.type }} - {{ v.manufacturer }} ({{ v.licensePlate }}) - {{ v.dailyFee }} Ft/nap</option>
             }
           </select>
+          <!-- Indítás gomb, meghívja a 'startRental()' metódust. -->
           <button class="btn btn-success" [disabled]="!selectedVehicleId" (click)="startRental()">Kölcsönzés indítása</button>
         </div>
       </div>
     </div>
 
+    <!-- Kölcsönzések naplója táblázat -->
     <div class="card shadow-sm">
       <div class="card-header bg-dark text-white">
         <h5 class="mb-0">Kölcsönzések naplója</h5>
@@ -60,6 +67,7 @@
             </tr>
           </thead>
           <tbody>
+            <!-- Végigiterálunk az ügyfél eddigi bérlésein (customer.rentals). -->
             @for (r of customer.rentals; track r.id) {
               <tr>
                 <td>
@@ -68,6 +76,7 @@
                 </td>
                 <td>{{ r.startDate }}</td>
                 <td>
+                  <!-- Ha még NINCS vége a bérlésnek (nincs endDate), mutatjuk a visszavétel űrlapot. -->
                   @if (!r.endDate) {
                     <div class="row g-2 align-items-center">
                       <div class="col-auto">
@@ -75,14 +84,17 @@
                       </div>
                       <div class="col-auto">
                         <div class="form-check">
+                          <!-- Ugyanígy eltároljuk a sérülés állapotát az adott bérléshez. -->
                           <input class="form-check-config" type="checkbox" [(ngModel)]="isDamagedMap[r.id]" [id]="'dmg'+r.id">
                           <label class="form-check-label ms-1" [for]="'dmg'+r.id">Sérült?</label>
                         </div>
                       </div>
                       <div class="col-auto">
+                        <!-- A visszavétel gomb átadja az aktuális bérlés ID-ját -->
                         <button class="btn btn-sm btn-outline-danger" (click)="finishRental(r.id)">Visszavétel</button>
                       </div>
                     </div>
+                    <!-- Ha MÁR VÉGET ÉRT a bérlés, az eredményeket mutatjuk. -->
                   } @else {
                     <span class="text-success">{{ r.endDate }}</span><br>
                     <small>{{ r.drivenKm }} km, {{ r.damageFee ? 'Sérült (+50k)' : 'Sértetlen' }}</small>
@@ -96,6 +108,7 @@
                   }
                 </td>
               </tr>
+              <!-- Az @empty blokk akkor fut le, ha a customer.rentals tömb üres. -->
             } @empty {
               <tr><td colspan="4" class="text-center text-muted">Még nem volt kölcsönzése.</td></tr>
             }

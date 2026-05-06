@@ -12,6 +12,7 @@ import { VehicleService } from '../services/vehicle.services';
   templateUrl: './vehicle-editor.html'
 })
 export class VehicleEditor implements OnInit {
+  // Inicializálunk egy üres/alapértelmezett járművet az adatkötéshez.
   vehicle: VehicleDTO = {
     id: 0,
     type: VehicleType.Car, // Alapértelmezett típus
@@ -25,9 +26,11 @@ export class VehicleEditor implements OnInit {
     status: VehicleStatus.Free
   };
 
+  //Enumokból tömnböt készítünk a legördülő választóhoz
   types = Object.values(VehicleType);
   statuses = Object.values(VehicleStatus);
 
+  // Szükséges Angular eszközök és saját service-ek behúzása.
   vehicleService = inject(VehicleService);
   router = inject(Router);
   activatedRoute = inject(ActivatedRoute);
@@ -37,9 +40,11 @@ export class VehicleEditor implements OnInit {
   isNew = true;
 
   ngOnInit(): void {
+    // Lekérjük az URL-ből az 'id' paramétert.
     const id = this.activatedRoute.snapshot.params['id'];
     if (id) {
       this.isNew = false;
+      // Ha van ID, lekérjük az adatokat a szerverről.
       this.vehicleService.getOne(id).subscribe({
         next: (data) => {
           this.vehicle = data;
@@ -61,10 +66,12 @@ export class VehicleEditor implements OnInit {
       return;
     }
 
+    // Eldöntjük, hogy új rögzítése (create) vagy meglévő frissítése (update) fog történni az API felé.
     const request = this.isNew
       ? this.vehicleService.create(this.vehicle)
       : this.vehicleService.update(this.vehicle);
 
+      // Elküldjük a kérést, és siker esetén visszavisszük a felhasználót a listára.
     request.subscribe({
       next: () => this.router.navigateByUrl('/vehicles'),
       error: (err) => console.error('Hiba mentéskor', err)

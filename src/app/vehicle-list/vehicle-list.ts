@@ -16,8 +16,8 @@ export class VehicleList implements OnInit {
   router = inject(Router);
   cdRef = inject(ChangeDetectorRef);
 
-  vehicles = signal<VehicleDTO[]>([]);
-  filteredVehicles = signal<VehicleDTO[]>([]);
+  vehicles = signal<VehicleDTO[]>([]); // A 'vehicles' tárolja a szerverről kapott TELJES adatbázist.
+  filteredVehicles = signal<VehicleDTO[]>([]); //szűrt lista
 
   // Kereső filterek
   typeFilter = '';
@@ -26,6 +26,7 @@ export class VehicleList implements OnInit {
   ngOnInit(): void {
     this.vehicleService.getAll().subscribe({
       next: (data) => {
+        // Betöltéskor mindkét lista megkapja a teljes adathalmazt.
         this.vehicles.set(data);
         this.filteredVehicles.set(data);
       },
@@ -34,6 +35,7 @@ export class VehicleList implements OnInit {
   }
 
   editVehicle(vehicle: VehicleDTO) {
+    // Üzleti logika: Nem engedjük szerkeszteni az autót, ha épp ki van adva valakinek.
     if (vehicle.status === VehicleStatus.Rented) {
       alert('Nem szerkesztheted ezt a járművet, mert jelenleg ki van kölcsönözve.');
       return;
@@ -51,6 +53,7 @@ export class VehicleList implements OnInit {
 
     this.vehicleService.delete(vehicle.id).subscribe({
       next: () => {
+        // Sikeres törlés után mindkét listából (a teljesből és a szűrtből is) kivesszük a törölt elemet.
         this.vehicles.set(this.vehicles().filter(v => v.id !== vehicle.id));
         this.filteredVehicles.set(this.filteredVehicles().filter(v => v.id !== vehicle.id));
         this.cdRef.markForCheck();
@@ -61,20 +64,24 @@ export class VehicleList implements OnInit {
 
   // --- KERESÉSI LOGIKA ---
   searchType(event: Event) {
+    //a keresés ne legyen kis/nagybetű érzékeny
     this.typeFilter = (event.target as HTMLInputElement).value.trim().toLowerCase();
-    this.applyFilter();
+    this.applyFilter(); // Meghívjuk a tényleges szűrő függvényt.
   }
 
+  //rendszám keresőnél
   searchPlate(event: Event) {
     this.plateFilter = (event.target as HTMLInputElement).value.trim().toLowerCase();
     this.applyFilter();
   }
 
+  //Szűrési logika: A teljes járműlistán végigmegyünk, és csak azokat hagyjuk meg, amelyek megfelelnek a keresési feltételeknek.
   applyFilter() {
     const result = this.vehicles().filter(v =>
       v.type.toLowerCase().includes(this.typeFilter) &&
       v.licensePlate.toLowerCase().includes(this.plateFilter)
     );
+    // Az eredményt beállítjuk a látható listának.
     this.filteredVehicles.set(result);
   }
 }

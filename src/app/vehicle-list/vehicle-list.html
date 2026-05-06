@@ -9,6 +9,7 @@
       <input type="text" class="form-control" placeholder="Keresés típus alapján (pl. Kishajó)..." (input)="searchType($event)">
     </div>
     <div class="col-md-6">
+      <!-- Az (input) esemény minden egyes billentyűleütéskor lefut, amikor a felhasználó gépel.-->
       <input type="text" class="form-control" placeholder="Keresés rendszám/lajstromszám alapján..." (input)="searchPlate($event)">
     </div>
   </div>
@@ -27,6 +28,7 @@
       </tr>
     </thead>
     <tbody>
+      <!-- Itt most nem az összes járművön (vehicles), hanem a szűrt listán (filteredVehicles) iterálunk végig. -->
       @for (v of filteredVehicles(); track v.id) {
         <tr>
           <td><strong>{{ v.type }}</strong></td>
@@ -34,6 +36,9 @@
           <td><span class="badge bg-secondary fs-6">{{ v.licensePlate }}</span></td>
           <td>{{ v.purchaseDate }}</td>
           <td>
+
+            <!--csak akkor teszi rá az adott CSS osztályt a HTML elemre, ha a feltétel igaz.
+            szabad jármű zöld, a kölcsönzött piros, a selejtezett sötét jelvényt kap -->
             <span class="badge"
                   [class.bg-success]="v.status === 'Szabad'"
                   [class.bg-danger]="v.status === 'Kikölcsönzött'"
@@ -49,6 +54,7 @@
           </td>
         </tr>
       } @empty {
+        <!-- Ha a keresés eredménye üres, ezt az üzenetet mutatjuk. -->
         <tr><td colspan="6" class="text-center text-muted">Nincs a keresésnek megfelelő jármű.</td></tr>
       }
     </tbody>
